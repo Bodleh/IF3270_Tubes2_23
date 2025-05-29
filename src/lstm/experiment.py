@@ -45,9 +45,9 @@ def run_experiments():
 
     print("\n\nExperiment 2: LSTM Cell Count")
     cell_count_configs = {
-        'lstm_32_cells': [('unidirectional', 32)],
-        'lstm_64_cells': [('unidirectional', 64)],
-        'lstm_128_cells': [('unidirectional', 128)],
+        'lstm_32_cells': [('bidirectional', 32)],
+        'lstm_64_cells': [('bidirectional', 64)],
+        'lstm_128_cells': [('bidirectional', 128)],
     }
     results['cell_count'] = [build_train_evaluate(train_ds, val_ds, test_ds, EPOCHS, name, NUM_CLASSES, MAX_VOCAB_SIZE, EMBEDDING_DIM, MAX_SEQUENCE_LENGTH, config) for name, config in cell_count_configs.items()]
 

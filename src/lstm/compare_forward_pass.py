@@ -17,7 +17,7 @@ def main():
     MODEL_NAME = 'test_lstm_forward_pass'
     MODEL_CONFIG = [('bidirectional', 64), ('unidirectional', 128)]
     
-    print(f"Loading Keras model '{MODEL_NAME}'...")
+    print(f"Building Keras model '{MODEL_NAME}'...")
     keras_model = build_keras_lstm_model(
         num_classes=NUM_CLASSES,
         vocab_size=15000,

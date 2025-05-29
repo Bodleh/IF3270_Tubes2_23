@@ -1,8 +1,6 @@
 import numpy as np
 
 def softmax(x):
-    """Softmax function for a batch of inputs."""
-    # x shape: (batch_size, num_classes)
     e_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
     return e_x / np.sum(e_x, axis=-1, keepdims=True)
 
@@ -110,7 +108,7 @@ class LSTMSingleScratch:
         else:
             return h_t
 
-class BidirectionalLSTMSratch:
+class BidirectionalLSTMScratch:
     """Batch-compatible forward pass for a Bidirectional LSTM."""
     def __init__(self, weights, return_sequences=False):
         self.return_sequences = return_sequences
@@ -152,7 +150,7 @@ class NumpyLSTM:
                 self.layers.append(EmbeddingScratch(weights))
             elif 'bidirectional' in layer_name:
                 rs = layer.return_sequences
-                self.layers.append(BidirectionalLSTMSratch(weights, rs))
+                self.layers.append(BidirectionalLSTMScratch(weights, rs))
             elif 'unidirectional' in layer_name:
                 rs = layer.return_sequences
                 self.layers.append(LSTMSingleScratch(weights, rs))
