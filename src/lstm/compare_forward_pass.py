@@ -1,58 +1,33 @@
 import numpy as np
-import tensorflow as tf
 from sklearn.metrics import f1_score, accuracy_score
 from data_loader import prepare_data
-from train import build_model
-from forward_scratch import EmbeddingScratch, BidirectionalLSTMSratch, DropoutScratch, DenseScratch
-
-def build_model_from_scratch(keras_model):
-    scratch_layers = []
-    
-    for layer in keras_model.layers:
-        layer_name = layer.name.lower()
-        weights = layer.get_weights()
-        
-        if 'embedding' in layer_name:
-            scratch_layers.append(EmbeddingScratch(weights))
-        elif 'bidirectional' in layer_name:
-            scratch_layers.append(BidirectionalLSTMSratch(weights))
-        elif 'dropout' in layer_name:
-            scratch_layers.append(DropoutScratch(layer.rate))
-        elif 'dense' in layer_name:
-            scratch_layers.append(DenseScratch(weights))
-            
-    return scratch_layers
-
-def forward_pass_scratch(x_input_batch, scratch_model):
-    output = x_input_batch
-    for layer in scratch_model:
-        if isinstance(layer, DropoutScratch):
-             output = layer.forward(output, training=False)
-        else:
-            output = layer.forward(output)
-    return output
+from lstm_keras import build_keras_lstm_model, train_model
+from lstm_scratch import NumpyLSTM
 
 def main():    
     BATCH_SIZE = 32
     
-    _, _, _, _, NUM_CLASSES, (X_test, y_test) = prepare_data(
+    train_ds, val_ds, _, _, NUM_CLASSES, (X_test, y_test) = prepare_data(
         max_vocab_size=15000, 
         max_sequence_length=250,
         batch_size=BATCH_SIZE
     )
     
     # Keras
-    MODEL_NAME = 'bidirectional_lstm'
-    MODEL_CONFIG = [('bidirectional', 64)]
+    MODEL_NAME = 'test_lstm_forward_pass'
+    MODEL_CONFIG = [('bidirectional', 64), ('unidirectional', 128)]
     
     print(f"Loading Keras model '{MODEL_NAME}'...")
-    keras_model = build_model(
+    keras_model = build_keras_lstm_model(
         num_classes=NUM_CLASSES,
         vocab_size=15000,
         emb_dim=128,
         seq_len=250,
         lstm_layers_config=MODEL_CONFIG
     )
+    
+    train_model(keras_model, train_ds, val_ds, 10, MODEL_NAME)
+    
     try:
         keras_model.load_weights(f'models/{MODEL_NAME}.weights.h5')
     except FileNotFoundError:
@@ -72,20 +47,8 @@ def main():
     print("\nBuilding and performing prediction with from-scratch model")
     print(f"Batch size: {BATCH_SIZE}")
     
-    scratch_model = build_model_from_scratch(keras_model)
-    
-    all_scratch_preds = []
-    num_samples = len(X_test)
-
-    for i in range(0, num_samples, BATCH_SIZE):
-        x_batch = X_test[i : i + BATCH_SIZE]
-
-        probs_batch = forward_pass_scratch(x_batch, scratch_model)
-
-        preds_batch = np.argmax(probs_batch, axis=1)
-        all_scratch_preds.append(preds_batch)
-    
-    scratch_preds = np.concatenate(all_scratch_preds)
+    scratch_model = NumpyLSTM(keras_model)
+    scratch_preds = scratch_model.predict(X_test, batch_size=BATCH_SIZE)
     
     scratch_f1 = f1_score(y_test, scratch_preds, average='macro')
     scratch_acc = accuracy_score(y_test, scratch_preds)
