@@ -5,7 +5,7 @@ from tensorflow.keras import layers, models, optimizers, regularizers
 def build_rnn_model(
     vocab_size: int,
     num_layers: int = 1,
-    units: int = 64,
+    units=64,
     bidirectional: bool = True,
     dropout: float = 0.3,
     rec_dropout: float = 0.15,
@@ -14,18 +14,21 @@ def build_rnn_model(
     emb_dim: int = 128,
     lr: float = 1e-3,
 ):
-    inp = layers.Input(shape=(max_len,), dtype="int32")
-    x = layers.Embedding(
-        vocab_size,
-        emb_dim,
-        mask_zero=True,
-        name="embed"
-    )(inp)
+    if isinstance(units, int):
+        units_per_layer = [units] * num_layers
+    else:
+        if len(units) != num_layers:
+            raise ValueError("len(units) must equal num_layers")
+        units_per_layer = list(units)
 
-    for i in range(num_layers):
+    inp = layers.Input(shape=(max_len,), dtype="int32")
+    x = layers.Embedding(vocab_size, emb_dim,
+                         mask_zero=True, name="embed")(inp)
+
+    for i, u in enumerate(units_per_layer):
         return_seq = (i < num_layers - 1)
         rnn = layers.SimpleRNN(
-            units,
+            u,
             dropout=dropout,
             recurrent_dropout=rec_dropout,
             kernel_regularizer=regularizers.l2(l2_reg),
