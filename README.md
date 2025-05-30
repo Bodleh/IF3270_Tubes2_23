@@ -38,7 +38,7 @@ To set up and run the programs in this repository, follow these steps:
     ```bash
     cd src/rnn
     pip install -r requirements.txt
-    ``` 
+    ```
 
     _Note: If a `requirements.txt` file is not present in a specific subdirectory, you might need to install dependencies manually based on the code._
 
@@ -48,7 +48,6 @@ To set up and run the programs in this repository, follow these steps:
     To run the CNN module:
 
     ```bash
-    # example
     cd src/cnn
     jupyter notebook main.ipynb
     ```
@@ -56,8 +55,12 @@ To set up and run the programs in this repository, follow these steps:
     To run the RNN module:
 
     ```bash
-    # example
     cd src/rnn
+
+    # Run the experiments
+    jupyter notebook main.ipynb
+
+    # Run to show the difference in Keras Model and scratch model
     python main.py
     ```
 
