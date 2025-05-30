@@ -49,7 +49,12 @@ To set up and run the programs in this repository, follow these steps:
 
     ```bash
     cd src/cnn
+    
+    # Run to see the difference in forward propagation between Keras model and scratch model
     jupyter notebook main.ipynb
+
+    # Run to see the experiments result
+    jupyter notebook pengujian.ipynb
     ```
 
     To run the RNN module:
@@ -81,6 +86,11 @@ To set up and run the programs in this repository, follow these steps:
 
     # You can run and plot all experiments and compare forward pass with jupyter notebook
     jupyter notebook pengujian.ipynb
+    ```
+
+    If you can't run the jupyter notebook, you can try:
+    ```bash
+    python -m notebook {file_name}.ipynb
     ```
 
 ## Team Member Task Distribution
